@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - copilot/test-app-on-ios-phone
+      - main
 
 permissions:
   contents: read
