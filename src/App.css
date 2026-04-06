@@ -21,10 +21,46 @@ button {
   &:hover {
     background-color: #535bf2;
   }
+
+  &:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+  }
 }
 
 .message {
   font-size: 1.5rem;
   font-weight: bold;
   color: #213547;
+}
+
+.wheel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wheel-pointer {
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 24px solid #e63946;
+}
+
+.wheel {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  animation: spin 0.4s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
