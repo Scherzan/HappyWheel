@@ -38,6 +38,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .wheel-pointer {
@@ -46,21 +47,13 @@ button {
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
   border-top: 24px solid #e63946;
+  margin-bottom: -8px;
+  z-index: 1;
 }
 
 .wheel {
-  width: 200px;
-  height: 200px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  animation: spin 0.4s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
