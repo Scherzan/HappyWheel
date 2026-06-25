@@ -57,3 +57,91 @@ button {
   border-radius: 50%;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
+
+.topbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Text-style button used for "sign out" and mode-switch links. */
+button.link {
+  background: none;
+  color: #646cff;
+  padding: 0;
+  font-size: 0.85rem;
+  text-decoration: underline;
+
+  &:hover {
+    background: none;
+    color: #535bf2;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 260px;
+}
+
+.auth-form input {
+  font-size: 1rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.auth-error,
+.history-error {
+  color: #e63946;
+  font-size: 0.9rem;
+}
+
+.history-section {
+  width: 320px;
+  max-width: 90vw;
+}
+
+.history-section h2 {
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.history-empty {
+  text-align: center;
+  color: #888;
+}
+
+.history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: #f5f5f7;
+  font-size: 0.9rem;
+}
+
+.history time {
+  color: #888;
+  white-space: nowrap;
+}

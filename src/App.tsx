@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import { useAuth } from './authContext'
+import { AuthForm } from './AuthForm'
+import { History } from './History'
+import { saveResult } from './api'
 
 type Reward = {
   label: string
@@ -99,11 +103,14 @@ function LuckyWheel({
   )
 }
 
-function App() {
+function Wheel() {
+  const { user, signOut, getIdToken } = useAuth()
   const [rotation, setRotation] = useState(0)
   const [duration, setDuration] = useState(MIN_DURATION)
   const [spinning, setSpinning] = useState(false)
   const [result, setResult] = useState<Reward | null>(null)
+  // Bumped after each saved spin so the History list refetches.
+  const [historyVersion, setHistoryVersion] = useState(0)
   const rotationRef = useRef(0)
   const spinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -131,13 +138,34 @@ function App() {
     setRotation(next)
     spinTimeoutRef.current = setTimeout(() => {
       setSpinning(false)
-      setResult(REWARDS[rewardAt(next)])
+      const landed = REWARDS[rewardAt(next)]
+      setResult(landed)
+      // Persist the result for the logged-in user, then refresh history.
+      saveResult(
+        {
+          reward: landed.label,
+          emoji: landed.emoji,
+          durationMs: Math.round(spinDuration * 1000),
+          speed,
+        },
+        getIdToken,
+      )
+        .then(() => setHistoryVersion((v) => v + 1))
+        .catch((err) => console.error('Failed to save result', err))
     }, spinDuration * 1000)
   }
 
   return (
     <div className="app">
-      <h1>HappyWheel</h1>
+      <header className="topbar">
+        <h1>HappyWheel</h1>
+        <div className="account">
+          <span>{user?.email}</span>
+          <button type="button" className="link" onClick={signOut}>
+            Sign out
+          </button>
+        </div>
+      </header>
       <div className="wheel-container">
         <div className="wheel-pointer" />
         <LuckyWheel rotation={rotation} duration={duration} />
@@ -150,6 +178,25 @@ function App() {
           {result.emoji} {result.label}
         </p>
       )}
+      <section className="history-section">
+        <h2>Your spins</h2>
+        <History version={historyVersion} />
+      </section>
+    </div>
+  )
+}
+
+function App() {
+  const { user, loading } = useAuth()
+  if (loading) {
+    return <div className="app">Loading…</div>
+  }
+  return user ? (
+    <Wheel />
+  ) : (
+    <div className="app">
+      <h1>HappyWheel</h1>
+      <AuthForm />
     </div>
   )
 }
