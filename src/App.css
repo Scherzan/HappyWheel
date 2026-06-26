@@ -2,124 +2,390 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  gap: 24px;
-  font-family: sans-serif;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* The unauthenticated screen (title + AuthForm) centers itself. */
+.app > h1 {
+  margin-top: 18vh;
+}
+
+/* ---- Buttons: smooth, modern accent styling ---- */
 button {
   font-size: 1rem;
-  padding: 10px 24px;
-  border-radius: 8px;
+  padding: 10px 22px;
+  border-radius: 10px;
   border: none;
-  background-color: #646cff;
-  color: #fff;
+  background-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  box-shadow: var(--shadow);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.08s ease,
+    color 0.2s ease;
+}
 
-  &:hover {
-    background-color: #535bf2;
-  }
+button:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
 
-  &:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-  }
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  background-color: var(--text-muted);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---- Tab bar ---- */
+.tabbar {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--surface);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.3px;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.tab {
+  background: none;
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.tab:hover {
+  background-color: var(--surface-2);
+  color: var(--text);
+  transform: none;
+}
+
+.tab.active {
+  background-color: var(--surface-active);
+  color: var(--accent-soft);
+  font-weight: 600;
+}
+
+.tab.active:hover {
+  background-color: var(--surface-active);
+}
+
+.tabbar-right {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  color: var(--text);
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.icon-btn:hover {
+  background-color: var(--surface-2);
+  transform: none;
+}
+
+.icon-btn.active {
+  background-color: var(--surface-active);
+  color: var(--accent-soft);
+}
+
+/* ---- Content panels ---- */
+.content {
+  width: 100%;
+  max-width: 440px;
+  padding: 28px 20px;
+  box-sizing: border-box;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-center {
+  align-items: center;
 }
 
 .message {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #213547;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
 }
 
+/* ---- Wheel (kept funky) ---- */
 .wheel-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 8px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .wheel-pointer {
   width: 0;
   height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 24px solid #e63946;
-  margin-bottom: -8px;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 26px solid #ff3b5c;
+  margin-bottom: -10px;
   z-index: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
 }
 
 .wheel {
-  width: 240px;
-  height: 240px;
+  width: min(340px, 80vw);
+  height: min(340px, 80vw);
   border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-wheel);
 }
 
-.topbar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+/* Plain hint above the (clickable) wheel. */
+.spin-hint {
+  color: var(--text);
+  font-size: 1rem;
+  margin: 0;
 }
 
-.account {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.85rem;
-  color: #555;
-}
-
-/* Text-style button used for "sign out" and mode-switch links. */
-button.link {
-  background: none;
-  color: #646cff;
-  padding: 0;
-  font-size: 0.85rem;
-  text-decoration: underline;
-
-  &:hover {
-    background: none;
-    color: #535bf2;
-  }
-}
-
+/* ---- Auth form ---- */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 260px;
+  margin: 24px auto;
 }
 
-.auth-form input {
+.auth-form input,
+.account-section input {
   font-size: 1rem;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+  width: 100%;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.auth-form input:focus,
+.account-section input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .auth-error,
 .history-error {
-  color: #e63946;
+  color: var(--danger);
   font-size: 0.9rem;
 }
 
-.history-section {
-  width: 320px;
-  max-width: 90vw;
+.account-ok {
+  color: var(--success);
+  font-size: 0.9rem;
 }
 
-.history-section h2 {
+/* ---- Account ---- */
+.account-panel h2 {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+}
+
+.account-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+
+.account-section h3 {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.account-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Inline input + action button. */
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-section input {
+  padding: 9px 12px;
+  font-size: 0.92rem;
+}
+
+/* Compact, auto-width account buttons (match the Use-it button feel). */
+.account-btn {
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.self-end {
+  align-self: flex-end;
+}
+
+.account-current {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---- Super reward ---- */
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.super-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.super-counter {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--super-accent);
+}
+
+/* Match the Use-it button: small, auto-width, sitting on the right. */
+.claim-btn {
+  background-color: var(--super-accent);
+  color: #fff;
+  padding: 7px 16px;
+  font-size: 0.85rem;
+  box-shadow: none;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+
+.claim-btn:hover {
+  background-color: var(--super-accent-hover);
+}
+
+.claim-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.claim-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.claim-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background-color: var(--surface-2);
+  border: 1px solid transparent;
+  cursor: pointer;
   font-size: 1.1rem;
-  text-align: center;
+}
+
+.claim-chip.selected {
+  border-color: var(--super-accent);
+  background-color: color-mix(in srgb, var(--super-accent) 18%, var(--surface-2));
+}
+
+.claim-chip input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--super-accent);
+}
+
+.claim-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ---- History / Your spins ---- */
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.filter input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent);
 }
 
 .history-empty {
   text-align: center;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .history {
@@ -133,15 +399,114 @@ button.link {
 
 .history li {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background-color: #f5f5f7;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background-color: var(--surface-2);
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.history li.used {
+  background-color: color-mix(in srgb, var(--success) 14%, var(--surface-2));
+}
+
+/* Super rewards get a smooth pink background (wins over .used). */
+.history li.super {
+  background: var(--super-bg);
+}
+
+.history-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.history-reward {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.history time,
+.history-sub {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.use-btn {
+  padding: 7px 16px;
+  font-size: 0.85rem;
+  background-color: var(--success);
+  white-space: nowrap;
+}
+
+.use-btn:hover {
+  background-color: var(--success-hover);
+}
+
+.used-badge {
+  color: var(--success);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* ---- Ranking ---- */
+.ranking {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ranking li {
+  display: grid;
+  grid-template-columns: 32px 1fr 44px 44px 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background-color: var(--surface-2);
   font-size: 0.9rem;
 }
 
-.history time {
-  color: #888;
+.ranking-head {
+  background: none !important;
+  padding-top: 0;
+  padding-bottom: 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.rank-pos {
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.rank-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.rank-num {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.super-num {
+  color: var(--super-accent);
+  font-weight: 600;
+}
+
+.used-num {
+  color: var(--success);
+  font-weight: 600;
 }

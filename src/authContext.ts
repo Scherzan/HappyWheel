@@ -5,11 +5,15 @@ export type AuthUser = { email: string }
 export type AuthContextValue = {
   user: AuthUser | null
   loading: boolean
-  signUp: (email: string, password: string) => Promise<void>
-  confirmSignUp: (email: string, code: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => void
   getIdToken: () => Promise<string>
+  // Account management
+  getAttributes: () => Promise<Record<string, string>>
+  updateName: (name: string) => Promise<void>
+  updateEmail: (email: string) => Promise<void>
+  verifyEmail: (code: string) => Promise<void>
+  changePassword: (oldPassword: string, newPassword: string) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

@@ -8,6 +8,9 @@ export type SpinResult = {
   createdAt: string
   durationMs?: number
   speed?: number
+  used?: boolean
+  usedAt?: string
+  isSuper?: boolean
 }
 
 export type NewSpinResult = {
@@ -53,4 +56,39 @@ export function saveResult(
 export async function listResults(getToken: GetToken): Promise<SpinResult[]> {
   const data = await request<{ items: SpinResult[] }>('/results', getToken)
   return data.items
+}
+
+// Redeem a reward once. The server rejects a second use (409 -> throws).
+export function markUsed(
+  spinId: string,
+  getToken: GetToken,
+): Promise<SpinResult> {
+  return request<SpinResult>('/results/use', getToken, {
+    method: 'POST',
+    body: JSON.stringify({ spinId }),
+  })
+}
+
+export type RankingEntry = {
+  name: string
+  rewards: number
+  superRewards: number
+  used: number
+}
+
+export async function getRanking(getToken: GetToken): Promise<RankingEntry[]> {
+  const data = await request<{ ranking: RankingEntry[] }>('/ranking', getToken)
+  return data.ranking
+}
+
+// Spend 10 rewards on a chosen reward. The server re-checks eligibility (409).
+export function claimSuper(
+  reward: string,
+  emoji: string,
+  getToken: GetToken,
+): Promise<SpinResult> {
+  return request<SpinResult>('/results/super', getToken, {
+    method: 'POST',
+    body: JSON.stringify({ reward, emoji }),
+  })
 }

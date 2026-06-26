@@ -36,6 +36,21 @@ function currentSession(): Promise<CognitoUserSession | null> {
   })
 }
 
+// A current user with a valid session attached — required before attribute /
+// password operations.
+function authedUser(): Promise<CognitoUser> {
+  return new Promise((resolve, reject) => {
+    const u = userPool.getCurrentUser()
+    if (!u) return reject(new Error('Not authenticated'))
+    u.getSession((err: Error | null, session: CognitoUserSession | null) => {
+      if (err || !session?.isValid()) {
+        return reject(err ?? new Error('Session expired'))
+      }
+      resolve(u)
+    })
+  })
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
@@ -51,26 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => setUser(null))
       .finally(() => setLoading(false))
-  }, [])
-
-  const signUp = useCallback((email: string, password: string) => {
-    return new Promise<void>((resolve, reject) => {
-      userPool.signUp(
-        email,
-        password,
-        [new CognitoUserAttribute({ Name: 'email', Value: email })],
-        [],
-        (err) => (err ? reject(err) : resolve()),
-      )
-    })
-  }, [])
-
-  const confirmSignUp = useCallback((email: string, code: string) => {
-    return new Promise<void>((resolve, reject) => {
-      cognitoUser(email).confirmRegistration(code, true, (err) =>
-        err ? reject(err) : resolve(),
-      )
-    })
   }, [])
 
   const signIn = useCallback((email: string, password: string) => {
@@ -99,9 +94,87 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return session.getIdToken().getJwtToken()
   }, [])
 
+  const getAttributes = useCallback(async () => {
+    const u = await authedUser()
+    return new Promise<Record<string, string>>((resolve, reject) => {
+      u.getUserAttributes((err, attrs) => {
+        if (err) return reject(err)
+        const map: Record<string, string> = {}
+        attrs?.forEach((a) => (map[a.getName()] = a.getValue()))
+        resolve(map)
+      })
+    })
+  }, [])
+
+  const updateAttribute = useCallback(async (name: string, value: string) => {
+    const u = await authedUser()
+    return new Promise<void>((resolve, reject) => {
+      u.updateAttributes(
+        [new CognitoUserAttribute({ Name: name, Value: value })],
+        (err) => (err ? reject(err) : resolve()),
+      )
+    })
+  }, [])
+
+  const updateName = useCallback(
+    (name: string) => updateAttribute('name', name),
+    [updateAttribute],
+  )
+
+  // Changing email re-triggers verification; the new address must be confirmed
+  // with verifyEmail before it becomes the sign-in identity.
+  const updateEmail = useCallback(
+    (email: string) => updateAttribute('email', email),
+    [updateAttribute],
+  )
+
+  const verifyEmail = useCallback(async (code: string) => {
+    const u = await authedUser()
+    return new Promise<void>((resolve, reject) => {
+      u.verifyAttribute('email', code, {
+        onSuccess: () => resolve(),
+        onFailure: (err) => reject(err),
+      })
+    })
+  }, [])
+
+  const changePassword = useCallback(
+    async (oldPassword: string, newPassword: string) => {
+      const u = await authedUser()
+      return new Promise<void>((resolve, reject) => {
+        u.changePassword(oldPassword, newPassword, (err) =>
+          err ? reject(err) : resolve(),
+        )
+      })
+    },
+    [],
+  )
+
   const value = useMemo(
-    () => ({ user, loading, signUp, confirmSignUp, signIn, signOut, getIdToken }),
-    [user, loading, signUp, confirmSignUp, signIn, signOut, getIdToken],
+    () => ({
+      user,
+      loading,
+      signIn,
+      signOut,
+      getIdToken,
+      getAttributes,
+      updateName,
+      updateEmail,
+      verifyEmail,
+      changePassword,
+    }),
+    [
+      user,
+      loading,
+      signIn,
+      signOut,
+      getIdToken,
+      getAttributes,
+      updateName,
+      updateEmail,
+      verifyEmail,
+      changePassword,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

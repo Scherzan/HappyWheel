@@ -3,22 +3,11 @@ import './App.css'
 import { useAuth } from './authContext'
 import { AuthForm } from './AuthForm'
 import { History } from './History'
+import { Account } from './Account'
+import { Ranking } from './Ranking'
 import { saveResult } from './api'
-
-type Reward = {
-  label: string
-  emoji: string
-}
-
-const REWARDS: Reward[] = [
-  { label: 'Supi gemacht!', emoji: '🎉' },
-  { label: 'Send a selfie', emoji: '📸' },
-  { label: 'Get a praise from your buddy', emoji: '🤗' },
-  { label: '2€ personal use', emoji: '💰' },
-  { label: 'Coffee outside', emoji: '☕' },
-  { label: '5€ Gemeinschaftskasse', emoji: '🏦' },
-  { label: 'Joker — choose any reward you like!', emoji: '🃏' },
-]
+import { useTheme, type Theme } from './theme'
+import { REWARDS, type Reward } from './rewards'
 
 const COLORS = [
   '#ff6b6b',
@@ -103,14 +92,12 @@ function LuckyWheel({
   )
 }
 
-function Wheel() {
-  const { user, signOut, getIdToken } = useAuth()
+function Wheel({ onSaved }: { onSaved: () => void }) {
+  const { getIdToken } = useAuth()
   const [rotation, setRotation] = useState(0)
   const [duration, setDuration] = useState(MIN_DURATION)
   const [spinning, setSpinning] = useState(false)
   const [result, setResult] = useState<Reward | null>(null)
-  // Bumped after each saved spin so the History list refetches.
-  const [historyVersion, setHistoryVersion] = useState(0)
   const rotationRef = useRef(0)
   const spinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -150,49 +137,158 @@ function Wheel() {
         },
         getIdToken,
       )
-        .then(() => setHistoryVersion((v) => v + 1))
+        .then(onSaved)
         .catch((err) => console.error('Failed to save result', err))
     }, spinDuration * 1000)
   }
 
   return (
-    <div className="app">
-      <header className="topbar">
-        <h1>HappyWheel</h1>
-        <div className="account">
-          <span>{user?.email}</span>
-          <button type="button" className="link" onClick={signOut}>
-            Sign out
-          </button>
-        </div>
-      </header>
-      <div className="wheel-container">
+    <div className="panel panel-center">
+      <p className="spin-hint">{spinning ? '🎡 Spinning…' : '🎡 Tap to spin'}</p>
+      <div
+        className="wheel-container"
+        onClick={handleSpin}
+        role="button"
+        aria-label="Spin the wheel"
+      >
         <div className="wheel-pointer" />
         <LuckyWheel rotation={rotation} duration={duration} />
       </div>
-      <button onClick={handleSpin} disabled={spinning}>
-        {spinning ? 'Spinning…' : 'Get Reward'}
-      </button>
       {result && (
         <p className="message">
           {result.emoji} {result.label}
         </p>
       )}
-      <section className="history-section">
-        <h2>Your spins</h2>
-        <History version={historyVersion} />
-      </section>
+    </div>
+  )
+}
+
+// Monochrome icons drawn with currentColor so they follow the active theme.
+const iconProps = {
+  width: 20,
+  height: 20,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 2,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  'aria-hidden': true,
+}
+
+const UserIcon = () => (
+  <svg {...iconProps}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
+  </svg>
+)
+
+const LogoutIcon = () => (
+  <svg {...iconProps}>
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <path d="M16 17l5-5-5-5" />
+    <path d="M21 12H9" />
+  </svg>
+)
+
+const MoonIcon = () => (
+  <svg {...iconProps}>
+    <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z" />
+  </svg>
+)
+
+const SunIcon = () => (
+  <svg {...iconProps}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+  </svg>
+)
+
+type Tab = 'wheel' | 'spins' | 'ranking' | 'account'
+
+function Shell({
+  theme,
+  onToggleTheme,
+}: {
+  theme: Theme
+  onToggleTheme: () => void
+}) {
+  const { user, signOut } = useAuth()
+  const [tab, setTab] = useState<Tab>('wheel')
+  // Bumped after a spin is saved or a reward is used, so History refetches.
+  const [historyVersion, setHistoryVersion] = useState(0)
+  const bump = () => setHistoryVersion((v) => v + 1)
+
+  return (
+    <div className="app">
+      <header className="tabbar">
+        <div className="brand">🎡 HappyWheel</div>
+        <nav className="tabs">
+          <button
+            className={tab === 'wheel' ? 'tab active' : 'tab'}
+            onClick={() => setTab('wheel')}
+          >
+            Wheel
+          </button>
+          <button
+            className={tab === 'spins' ? 'tab active' : 'tab'}
+            onClick={() => setTab('spins')}
+          >
+            Your Rewards
+          </button>
+          <button
+            className={tab === 'ranking' ? 'tab active' : 'tab'}
+            onClick={() => setTab('ranking')}
+          >
+            Ranking
+          </button>
+        </nav>
+        <div className="tabbar-right">
+          <button
+            className="icon-btn"
+            onClick={onToggleTheme}
+            title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <button
+            className={tab === 'account' ? 'icon-btn active' : 'icon-btn'}
+            onClick={() => setTab('account')}
+            title={user?.email ?? 'Account'}
+            aria-label="Account"
+          >
+            <UserIcon />
+          </button>
+          <button
+            className="icon-btn"
+            onClick={signOut}
+            title="Log out"
+            aria-label="Log out"
+          >
+            <LogoutIcon />
+          </button>
+        </div>
+      </header>
+
+      <main className="content">
+        {tab === 'wheel' && <Wheel onSaved={bump} />}
+        {tab === 'spins' && <History version={historyVersion} onUsed={bump} />}
+        {tab === 'ranking' && <Ranking />}
+        {tab === 'account' && <Account />}
+      </main>
     </div>
   )
 }
 
 function App() {
   const { user, loading } = useAuth()
+  const { theme, toggle } = useTheme()
   if (loading) {
     return <div className="app">Loading…</div>
   }
   return user ? (
-    <Wheel />
+    <Shell theme={theme} onToggleTheme={toggle} />
   ) : (
     <div className="app">
       <h1>HappyWheel</h1>
