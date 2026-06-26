@@ -142,11 +142,41 @@ button:disabled {
   align-items: center;
 }
 
+/* Reward shown as a voucher/ticket: dashed frame with punched side notches. */
 .message {
-  font-size: 1.4rem;
-  font-weight: 700;
+  position: relative;
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: var(--text);
   text-align: center;
+  background: var(--surface);
+  border: 2px dashed #d4a72c; /* warm gold voucher edge */
+  border-radius: 14px;
+  padding: 16px 30px;
+  margin: 4px 0 0;
+  max-width: 90%;
+  box-shadow: var(--shadow);
+}
+
+.message::before,
+.message::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  background: var(--bg);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.message::before {
+  left: -11px;
+}
+
+.message::after {
+  right: -11px;
 }
 
 /* ---- Wheel (kept funky) ---- */
@@ -176,11 +206,49 @@ button:disabled {
   box-shadow: var(--shadow-wheel);
 }
 
-/* Plain hint above the (clickable) wheel. */
+/* Plain hint above the (clickable) wheel — only the font is funky. */
 .spin-hint {
+  font-family: 'Fredoka', system-ui, sans-serif;
   color: var(--text);
   font-size: 1rem;
   margin: 0;
+}
+
+/* ---- Confetti (result celebration) ---- */
+.confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -16px;
+  border-radius: 2px;
+  opacity: 0;
+  animation-name: confetti-fall;
+  animation-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0), 105vh, 0) rotate(900deg);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
 }
 
 /* ---- Auth form ---- */

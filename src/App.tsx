@@ -5,6 +5,7 @@ import { AuthForm } from './AuthForm'
 import { History } from './History'
 import { Account } from './Account'
 import { Ranking } from './Ranking'
+import { Confetti } from './Confetti'
 import { saveResult } from './api'
 import { useTheme, type Theme } from './theme'
 import { REWARDS, type Reward } from './rewards'
@@ -155,9 +156,12 @@ function Wheel({ onSaved }: { onSaved: () => void }) {
         <LuckyWheel rotation={rotation} duration={duration} />
       </div>
       {result && (
-        <p className="message">
-          {result.emoji} {result.label}
-        </p>
+        <>
+          <Confetti />
+          <p className="message">
+            {result.emoji} {result.label}
+          </p>
+        </>
       )}
     </div>
   )
