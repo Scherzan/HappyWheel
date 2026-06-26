@@ -1,12 +1,66 @@
 :root {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
+
+  /* Light theme (default) */
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --surface-2: #f0f1f5;
+  --surface-active: #ecedff;
+  --text: #1c2330;
+  --text-muted: #7a818d;
+  --border: #e6e6ea;
+
+  --accent: #646cff;
+  --accent-hover: #535bf2;
+  --accent-soft: #4d4dff;
+  --on-accent: #ffffff;
+
+  --success: #2a9d4a;
+  --success-hover: #248040;
+  --danger: #e63946;
+
+  --super-accent: #e84c9a;
+  --super-accent-hover: #d63d8a;
+  --super-bg: linear-gradient(135deg, #ffd9ec 0%, #ffc4e1 100%);
+
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-wheel: 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='dark'] {
+  --bg: #0f1116;
+  --surface: #181b22;
+  --surface-2: #21252e;
+  --surface-active: #2b2f6b;
+  --text: #e8eaf0;
+  --text-muted: #9aa1ad;
+  --border: #2a2f3a;
+
+  --accent: #7c83ff;
+  --accent-hover: #9197ff;
+  --accent-soft: #aab0ff;
+  --on-accent: #0f1116;
+
+  --success: #34c759;
+  --success-hover: #2ea84e;
+  --danger: #ff6b76;
+
+  --super-accent: #ff7ec0;
+  --super-accent-hover: #ff96cd;
+  --super-bg: linear-gradient(135deg, #4a1f3a 0%, #6e2b54 100%);
+
+  --shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  --shadow-wheel: 0 8px 30px rgba(0, 0, 0, 0.55);
 }
 
 body {
   margin: 0;
-  background: #fff;
-  color: #213547;
+  background: var(--bg);
+  color: var(--text);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 h1 {
