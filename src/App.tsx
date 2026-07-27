@@ -14,6 +14,8 @@ const REWARDS: Reward[] = [
   { label: 'Coffee outside', emoji: '☕' },
   { label: '5€ Gemeinschaftskasse', emoji: '🏦' },
   { label: 'Joker — choose any reward you like!', emoji: '🃏' },
+  { label: 'Turn again!', emoji: '🔄' },
+  { label: 'Take the lift', emoji: '🛗' },
 ]
 
 const COLORS = [
@@ -24,6 +26,8 @@ const COLORS = [
   '#ff9f45',
   '#c77dff',
   '#54d1db',
+  '#f472b6',
+  '#8aff8a',
 ]
 
 // Spin physics: random duration and speed decide where the wheel stops.
@@ -100,11 +104,12 @@ function LuckyWheel({
 }
 
 function App() {
-  const [rotation, setRotation] = useState(0)
+  // Randomize the wheel's starting position each time the app is opened.
+  const [rotation, setRotation] = useState(() => Math.random() * 360)
   const [duration, setDuration] = useState(MIN_DURATION)
   const [spinning, setSpinning] = useState(false)
   const [result, setResult] = useState<Reward | null>(null)
-  const rotationRef = useRef(0)
+  const rotationRef = useRef(rotation)
   const spinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
