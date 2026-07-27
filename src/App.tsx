@@ -77,7 +77,8 @@ function LuckyWheel({
       }}
     >
       {REWARDS.map((reward, i) => {
-        const labelPos = polar((i + 0.5) * SEGMENT, 64)
+        const midAngle = (i + 0.5) * SEGMENT
+        const labelPos = polar(midAngle, 64)
         return (
           <g key={i}>
             <path
@@ -92,6 +93,7 @@ function LuckyWheel({
               fontSize="16"
               textAnchor="middle"
               dominantBaseline="central"
+              transform={`rotate(${midAngle} ${labelPos.x} ${labelPos.y})`}
             >
               {reward.emoji}
             </text>
